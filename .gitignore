@@ -22,3 +22,4 @@ go.work
 
 #.idea
 thrift/.idea
+.idea
