@@ -10,14 +10,14 @@ func main() {
 	ch := make(chan error)
 
 	go func() {
-		as := handler.UserService{}
-
+		// user code
+		userServ := handler.UserService{}
 		// 创建处理器
-		processor := user.NewUserServiceProcessor(as)
-		// 配置传输类型
-		transportFactory := thrift.NewTBufferedTransportFactory(10000000)
+		processor := user.NewUserServiceProcessor(userServ)
 		// 配置传输协议，序列化和反序列化，compact/binary/json
 		protocolFactory := thrift.NewTCompactProtocolFactoryConf(&thrift.TConfiguration{})
+		// 配置传输类型
+		transportFactory := thrift.NewTBufferedTransportFactory(10000000)
 		// 构造socket连接
 		serverTransport, _ := thrift.NewTServerSocket("127.0.0.1:9090")
 		// 配置服务器
