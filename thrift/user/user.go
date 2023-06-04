@@ -165,6 +165,178 @@ func (p *UserInfo) String() string {
 func (p *UserInfo) Validate() error {
   return nil
 }
+// Attributes:
+//  - Code
+//  - Message
+type Exception struct {
+  Code []byte `thrift:"code,1" db:"code" json:"code,omitempty"`
+  Message *string `thrift:"message,2" db:"message" json:"message,omitempty"`
+}
+
+func NewException() *Exception {
+  return &Exception{}
+}
+
+var Exception_Code_DEFAULT []byte
+
+func (p *Exception) GetCode() []byte {
+  return p.Code
+}
+var Exception_Message_DEFAULT string
+func (p *Exception) GetMessage() string {
+  if !p.IsSetMessage() {
+    return Exception_Message_DEFAULT
+  }
+return *p.Message
+}
+func (p *Exception) IsSetCode() bool {
+  return p.Code != nil
+}
+
+func (p *Exception) IsSetMessage() bool {
+  return p.Message != nil
+}
+
+func (p *Exception) Read(ctx context.Context, iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(ctx); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 1:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField1(ctx, iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 2:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField2(ctx, iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(ctx, fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(ctx); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(ctx); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *Exception)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadBinary(ctx); err != nil {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  p.Code = v
+}
+  return nil
+}
+
+func (p *Exception)  ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(ctx); err != nil {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Message = &v
+}
+  return nil
+}
+
+func (p *Exception) Write(ctx context.Context, oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin(ctx, "Exception"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField1(ctx, oprot); err != nil { return err }
+    if err := p.writeField2(ctx, oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(ctx); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(ctx); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *Exception) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+  if p.IsSetCode() {
+    if err := oprot.WriteFieldBegin(ctx, "code", thrift.STRING, 1); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:code: ", p), err) }
+    if err := oprot.WriteBinary(ctx, p.Code); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T.code (1) field write error: ", p), err) }
+    if err := oprot.WriteFieldEnd(ctx); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:code: ", p), err) }
+  }
+  return err
+}
+
+func (p *Exception) writeField2(ctx context.Context, oprot thrift.TProtocol) (err error) {
+  if p.IsSetMessage() {
+    if err := oprot.WriteFieldBegin(ctx, "message", thrift.STRING, 2); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:message: ", p), err) }
+    if err := oprot.WriteString(ctx, string(*p.Message)); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T.message (2) field write error: ", p), err) }
+    if err := oprot.WriteFieldEnd(ctx); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 2:message: ", p), err) }
+  }
+  return err
+}
+
+func (p *Exception) Equals(other *Exception) bool {
+  if p == other {
+    return true
+  } else if p == nil || other == nil {
+    return false
+  }
+  if bytes.Compare(p.Code, other.Code) != 0 { return false }
+  if p.Message != other.Message {
+    if p.Message == nil || other.Message == nil {
+      return false
+    }
+    if (*p.Message) != (*other.Message) { return false }
+  }
+  return true
+}
+
+func (p *Exception) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("Exception(%+v)", *p)
+}
+
+func (p *Exception) Error() string {
+  return p.String()
+}
+
+func (Exception) TExceptionType() thrift.TExceptionType {
+  return thrift.TExceptionTypeCompiled
+}
+
+var _ thrift.TException = (*Exception)(nil)
+
+func (p *Exception) Validate() error {
+  return nil
+}
 type UserService interface {
   // Parameters:
   //  - ID
@@ -221,6 +393,11 @@ func (p *UserServiceClient) GetUser(ctx context.Context, id int32) (_r *UserInfo
   if _err != nil {
     return
   }
+  switch {
+  case _result2.E!= nil:
+    return _r, _result2.E
+  }
+
   if _ret3 := _result2.GetSuccess(); _ret3 != nil {
     return _ret3, nil
   }
@@ -261,10 +438,11 @@ func (p *UserServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFuncti
 }
 
 func NewUserServiceProcessor(handler UserService) *UserServiceProcessor {
+
   self7 := &UserServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
   self7.processorMap["GetUser"] = &userServiceProcessorGetUser{handler:handler}
   self7.processorMap["GetName"] = &userServiceProcessorGetName{handler:handler}
-  return self7
+return self7
 }
 
 func (p *UserServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -332,26 +510,31 @@ func (p *userServiceProcessorGetUser) Process(ctx context.Context, seqId int32, 
   if retval, err2 := p.handler.GetUser(ctx, args.ID); err2 != nil {
     tickerCancel()
     err = thrift.WrapTException(err2)
-    if errors.Is(err2, thrift.ErrAbandonRequest) {
-      return false, thrift.WrapTException(err2)
+    switch v := err2.(type) {
+    case *Exception:
+      result.E = v
+    default:
+      if errors.Is(err2, thrift.ErrAbandonRequest) {
+        return false, thrift.WrapTException(err2)
+      }
+      _exc10 := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetUser: " + err2.Error())
+      if err2 := oprot.WriteMessageBegin(ctx, "GetUser", thrift.EXCEPTION, seqId); err2 != nil {
+        _write_err9 = thrift.WrapTException(err2)
+      }
+      if err2 := _exc10.Write(ctx, oprot); _write_err9 == nil && err2 != nil {
+        _write_err9 = thrift.WrapTException(err2)
+      }
+      if err2 := oprot.WriteMessageEnd(ctx); _write_err9 == nil && err2 != nil {
+        _write_err9 = thrift.WrapTException(err2)
+      }
+      if err2 := oprot.Flush(ctx); _write_err9 == nil && err2 != nil {
+        _write_err9 = thrift.WrapTException(err2)
+      }
+      if _write_err9 != nil {
+        return false, thrift.WrapTException(_write_err9)
+      }
+      return true, err
     }
-    _exc10 := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetUser: " + err2.Error())
-    if err2 := oprot.WriteMessageBegin(ctx, "GetUser", thrift.EXCEPTION, seqId); err2 != nil {
-      _write_err9 = thrift.WrapTException(err2)
-    }
-    if err2 := _exc10.Write(ctx, oprot); _write_err9 == nil && err2 != nil {
-      _write_err9 = thrift.WrapTException(err2)
-    }
-    if err2 := oprot.WriteMessageEnd(ctx); _write_err9 == nil && err2 != nil {
-      _write_err9 = thrift.WrapTException(err2)
-    }
-    if err2 := oprot.Flush(ctx); _write_err9 == nil && err2 != nil {
-      _write_err9 = thrift.WrapTException(err2)
-    }
-    if _write_err9 != nil {
-      return false, thrift.WrapTException(_write_err9)
-    }
-    return true, err
   } else {
     result.Success = retval
   }
@@ -560,8 +743,10 @@ func (p *UserServiceGetUserArgs) String() string {
 
 // Attributes:
 //  - Success
+//  - E
 type UserServiceGetUserResult struct {
   Success *UserInfo `thrift:"success,0" db:"success" json:"success,omitempty"`
+  E *Exception `thrift:"e,1" db:"e" json:"e,omitempty"`
 }
 
 func NewUserServiceGetUserResult() *UserServiceGetUserResult {
@@ -575,8 +760,19 @@ func (p *UserServiceGetUserResult) GetSuccess() *UserInfo {
   }
 return p.Success
 }
+var UserServiceGetUserResult_E_DEFAULT *Exception
+func (p *UserServiceGetUserResult) GetE() *Exception {
+  if !p.IsSetE() {
+    return UserServiceGetUserResult_E_DEFAULT
+  }
+return p.E
+}
 func (p *UserServiceGetUserResult) IsSetSuccess() bool {
   return p.Success != nil
+}
+
+func (p *UserServiceGetUserResult) IsSetE() bool {
+  return p.E != nil
 }
 
 func (p *UserServiceGetUserResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
@@ -595,6 +791,16 @@ func (p *UserServiceGetUserResult) Read(ctx context.Context, iprot thrift.TProto
     case 0:
       if fieldTypeId == thrift.STRUCT {
         if err := p.ReadField0(ctx, iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(ctx, fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 1:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField1(ctx, iprot); err != nil {
           return err
         }
       } else {
@@ -625,11 +831,20 @@ func (p *UserServiceGetUserResult)  ReadField0(ctx context.Context, iprot thrift
   return nil
 }
 
+func (p *UserServiceGetUserResult)  ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+  p.E = &Exception{}
+  if err := p.E.Read(ctx, iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.E), err)
+  }
+  return nil
+}
+
 func (p *UserServiceGetUserResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
   if err := oprot.WriteStructBegin(ctx, "GetUser_result"); err != nil {
     return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
   if p != nil {
     if err := p.writeField0(ctx, oprot); err != nil { return err }
+    if err := p.writeField1(ctx, oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(ctx); err != nil {
     return thrift.PrependError("write field stop error: ", err) }
@@ -647,6 +862,19 @@ func (p *UserServiceGetUserResult) writeField0(ctx context.Context, oprot thrift
     }
     if err := oprot.WriteFieldEnd(ctx); err != nil {
       return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
+  }
+  return err
+}
+
+func (p *UserServiceGetUserResult) writeField1(ctx context.Context, oprot thrift.TProtocol) (err error) {
+  if p.IsSetE() {
+    if err := oprot.WriteFieldBegin(ctx, "e", thrift.STRUCT, 1); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:e: ", p), err) }
+    if err := p.E.Write(ctx, oprot); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.E), err)
+    }
+    if err := oprot.WriteFieldEnd(ctx); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 1:e: ", p), err) }
   }
   return err
 }

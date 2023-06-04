@@ -7,10 +7,15 @@ struct UserInfo {
     2:string name
 }
 
+exception Exception {
+    1: optional binary code
+    2: optional string message
+}
+
 # 定义一个用户服务
 service UserService{
     # 定义一个GetUser方法（接收一个用户id，返回上面定义的用户信息）
-    UserInfo GetUser(1:i32 id)
+    UserInfo GetUser(1:i32 id) throws (1: Exception e)
     # 定义一个GetName方法（接收一个用户id，返回用户名称）
     string GetName(1:i32 id)
 }
