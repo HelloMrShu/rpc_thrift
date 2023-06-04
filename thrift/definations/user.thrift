@@ -17,5 +17,5 @@ service UserService{
     # 定义一个GetUser方法（接收一个用户id，返回上面定义的用户信息）
     UserInfo GetUser(1:i32 id) throws (1: Exception e)
     # 定义一个GetName方法（接收一个用户id，返回用户名称）
-    string GetName(1:i32 id)
+    string GetName(1:i32 id) throws (1: Exception e)
 }
