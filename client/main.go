@@ -23,6 +23,9 @@ func main() {
 	name, _ := client.GetName(ctx, 123)
 	fmt.Println(name)
 
+	name, err := client.GetName(ctx, -123)
+	fmt.Println(err)
+
 	// 关闭连接
 	if err := socket.Close(); err != nil {
 		panic("client close failed")
